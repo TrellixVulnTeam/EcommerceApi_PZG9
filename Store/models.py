@@ -74,7 +74,5 @@ class ShippingCustomerAddress(models.Model):
     zipcode = models.CharField(max_length=100,null=True)
     date_added = models.DateTimeField(auto_now_add=True)
 
-
-
-    
-
+    def __str__(self) -> str:
+        return self.customer.email
