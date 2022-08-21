@@ -2,7 +2,29 @@ from operator import truediv
 from django.db import models
 from django.contrib.auth.models import User
 
-# Create your models here.
+#Create your models here
+
+
+# size choices for product
+class SizeChoices(models.TextChoices):    
+    
+    EXTRA_SMALL = 'XS'
+    SMALL = "S"
+    MEDIUM = "M"
+    LARGE = "L"
+    EXTRA_LARGE = 'XL'
+
+class BrandChoices(models.TextChoices):
+    
+    NIKE = 'Nike'
+    DIOR = 'Dior'
+    ADIDAS = 'Adidas'
+    UNDER_ARMOUR = 'Under Armour'
+    H_and_M = 'H&M'
+    ZARA = 'Zara'
+    POLO = 'Polo'
+    LEVIS = 'Levis'       
+    
 
 
 #Customer model - OneToOne with User 
@@ -14,34 +36,22 @@ class Customer(models.Model):
     
     def __str__(self):
         return self.name
-    
-#Brand model - OneToOne with Product
-class Brand(models.Model):
-    name = models.CharField(max_length=20, null=False)
 
-   
-    def __str__(self):
-        return self.name
-
-
-   
+       
 #Product model - OneToMany with OrderItem   
 class Product(models.Model):
     
-    sizeChoices = (
-        ('s','Small'),
-        ('m', 'Medium'),
-        ('l', 'Large'),
-        ('xl','Extra Large')
-    )
-     
     name = models.CharField(max_length=50, null=False, blank=False)
-    price = models.FloatField(blank=True, null=False)
+    price = models.FloatField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    brand = models.OneToOneField(Brand, on_delete=models.CASCADE)   
-    size = models.CharField(max_length=20, choices=sizeChoices)
+    brand = models.CharField(max_length=20, choices=BrandChoices.choices, default=BrandChoices.DIOR)
+    size = models.CharField(max_length=20, choices=SizeChoices.choices, default=SizeChoices.EXTRA_SMALL)
 
-
+    
+    class Meta:
+        ordering = ['-created_at']
+        
+        
     def __str__(self):
         return self.name
     
@@ -53,8 +63,7 @@ class Order(models.Model):
     transaction_id = models.CharField(max_length=100, null=True)
     
     def __str__(self):
-        #set the name of the customer here as well in the order
-        return " Customer - {} Transaction ID - {}".format(self.customer.name, str(self.transaction_id))
+        return "Customer - {} Transaction ID - {} ".format(self.customer.name, str(self.transaction_id))
     
     
 class OrderItem(models.Model):
@@ -63,9 +72,11 @@ class OrderItem(models.Model):
     quantity = models.IntegerField(default=0, null=True, blank=True)
     date_added = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self) -> str:
+    def __str__(self):
         return self.product.name
-
+    
+    
+    
 class ShippingCustomerAddress(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, blank=True)
