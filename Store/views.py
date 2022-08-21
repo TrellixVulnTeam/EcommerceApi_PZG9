@@ -30,7 +30,7 @@ class ProductsListView(generics.GenericAPIView, mixins.ListModelMixin, mixins.Cr
         return self.create(request, *args, **kwargs)
 
 
-#Retreiving, Updating and Deleteing a post
+#Retreiving, Updating and Delete a post
 class ProductDetailView(
     generics.GenericAPIView,
     mixins.RetrieveModelMixin,
